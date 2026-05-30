@@ -9,6 +9,7 @@
 補資料腳本也用 Docker 跑: docker compose run --rm stock-pipeline python -m app.backfill_prices
 
 日常更新: docker compose run --rm stock-pipeline python -m app.main
+    => docker compose run --rm stock-pipeline 也可以
 
 -
 
