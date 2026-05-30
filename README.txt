@@ -2,13 +2,13 @@
 
 -
 
-建立 image 並執行：docker compose up --build
+建立 image 並執行: docker compose up --build
 
-之後要手動跑：docker compose run --rm stock-pipeline
+之後要手動跑: docker compose run --rm stock-pipeline
 
-補資料腳本也用 Docker 跑：docker compose run --rm stock-pipeline python -m app.backfill_prices
+補資料腳本也用 Docker 跑: docker compose run --rm stock-pipeline python -m app.backfill_prices
 
-日常更新：docker compose run --rm stock-pipeline python -m app.main
+日常更新: docker compose run --rm stock-pipeline python -m app.main
 
 -
 
