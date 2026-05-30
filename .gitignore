@@ -1,0 +1,18 @@
+# 虛擬環境不上傳
+.venv/
+
+# Python 快取不上傳
+__pycache__/
+*.pyc
+
+# 環境變數不上傳
+.env
+
+# Google 金鑰不上傳
+credentials/
+
+# SQLite 資料庫不上傳
+data/
+
+# VS Code 設定
+.vscode/
