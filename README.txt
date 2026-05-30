@@ -1,17 +1,21 @@
-先 python -m venv stock-pipeline，建立虛擬環境
+從 github 拉檔案下來：
+    => git clone https://github.com/ZB12ZB12/stock-pipeline.git
+切換到專案根目錄
+    => cd stock-pipeline
 
--
+pull 完後，需要補上 gitignore 裡面的檔案：
+1. .env
+2. credentials/google_service_account.json
 
-建立 image 並執行: docker compose up --build
-
-之後要手動跑: docker compose run --rm stock-pipeline
-
-補資料腳本也用 Docker 跑: docker compose run --rm stock-pipeline python -m app.backfill_prices
+docker compose build
 
 日常更新: docker compose run --rm stock-pipeline python -m app.main
     => docker compose run --rm stock-pipeline 也可以
+補資料腳本也用 Docker 跑: docker compose run --rm stock-pipeline python -m app.backfill_prices
 
 -
+
+在本機終端機直接跑：
 
 新增股票時：
 python -m app.backfill_prices
@@ -29,3 +33,7 @@ python -m app.backfill_prices
         => 同一天同一檔不會重複新增
 python -m app.backfill_prices
     => 當想要讓數據跑到 google sheet 上時，就跑這個腳本
+
+-
+
+第一次建立 image 並執行: docker compose up --build
