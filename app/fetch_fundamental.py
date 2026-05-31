@@ -1,7 +1,7 @@
 import re
 from datetime import date, timedelta
 import requests
-from app.config import FINMIND_TOKEN
+from app.config import FINMIND_TOKEN, HORIZON
 
 
 FINMIND_API_URL = "https://api.finmindtrade.com/api/v4/data"
@@ -67,7 +67,7 @@ def fetch_recent_fundamentals(stock_id: str):
     毛利率 = GrossProfit / Revenue * 100
     """
 
-    start_date = (date.today() - timedelta(days=365)).isoformat()
+    start_date = (date.today() - timedelta(days=HORIZON)).isoformat()
 
     data = fetch_finmind_data(
         dataset="TaiwanStockFinancialStatements",
@@ -128,7 +128,7 @@ def fetch_latest_dividend(stock_id: str):
     抓最近年度現金股利。
     """
 
-    start_date = (date.today() - timedelta(days=365)).isoformat()
+    start_date = (date.today() - timedelta(days=HORIZON)).isoformat()
 
     data = fetch_finmind_data(
         dataset="TaiwanStockDividend",

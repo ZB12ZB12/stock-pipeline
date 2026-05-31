@@ -1,7 +1,7 @@
 import gspread
 from google.oauth2.service_account import Credentials
 
-from app.config import GOOGLE_CREDENTIAL_FILE, GOOGLE_SHEET_NAME
+from app.config import GOOGLE_CREDENTIAL_FILE, GOOGLE_SHEET_NAME, YEARS
 
 
 SCOPES = [
@@ -108,7 +108,7 @@ def update_stock_analysis_sheet(reports: list[dict]):
                 quarter_dates.append(report_date)
 
     # 只取最近 4 季，但輸出時由舊到新
-    quarter_dates = sorted(quarter_dates, reverse=True)[:4]
+    quarter_dates = sorted(quarter_dates, reverse=True)[:YEARS* 4]
     quarter_dates = sorted(quarter_dates)
 
     # EPS：由舊到新

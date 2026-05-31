@@ -7,6 +7,7 @@ def backfill_all_stocks(period: str = "1y"):
     initialize_database()
 
     portfolio = get_portfolio()
+    print(F"(backfill_prices.py)")
 
     for item in portfolio:
         stock_id = item["stock_id"]

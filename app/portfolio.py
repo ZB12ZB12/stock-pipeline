@@ -1,6 +1,7 @@
 import csv
+from app.config import PORTFOLIO_CSV_PATH
 
-PORTFOLIO_CSV_PATH = "data/portfolio.csv"
+# PORTFOLIO_CSV_PATH = "data/portfolio_sres5.csv"
 
 def get_portfolio():
     portfolio = []
@@ -11,6 +12,7 @@ def get_portfolio():
         for row in reader:
             stock_id = row["stock_id"].strip()
             stock_name = row["stock_name"].strip()
+            print(F"get stock (portfolio.py): {stock_name}")
             shares = int(row["shares"])
 
             if stock_id:

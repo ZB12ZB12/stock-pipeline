@@ -13,3 +13,9 @@ GOOGLE_CREDENTIAL_FILE = os.getenv(
 )
 
 FINMIND_TOKEN = os.getenv("FINMIND_TOKEN", "")
+
+PORTFOLIO_CSV_PATH = os.getenv("PORTFOLIO_CSV_PATH", "")
+
+YEARS = int(os.getenv("YEARS", ""))
+
+HORIZON = 365* YEARS
