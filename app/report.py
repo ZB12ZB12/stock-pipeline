@@ -1,6 +1,9 @@
 from datetime import date, timedelta
-
-from app.database import get_connection
+from app.database import (
+    get_connection,
+    get_recent_fundamentals,
+    get_latest_dividend,
+)
 
 
 def get_recent_prices(stock_id: str, limit: int = 5):
@@ -57,6 +60,9 @@ def build_stock_report(stock_id: str):
     three_months_ago = (today - timedelta(days=90)).isoformat()
     one_month_ago = (today - timedelta(days=30)).isoformat()
 
+    fundamentals = get_recent_fundamentals(stock_id, limit=4)
+    latest_dividend = get_latest_dividend(stock_id)
+
     return {
         "stock_id": stock_id,
         "recent_prices": get_recent_prices(stock_id, limit=5),
@@ -65,6 +71,8 @@ def build_stock_report(stock_id: str):
         "six_month_high": get_high_price(stock_id, six_months_ago),
         "three_month_high": get_high_price(stock_id, three_months_ago),
         "one_month_high": get_high_price(stock_id, one_month_ago),
+        "fundamentals": fundamentals,
+        "latest_dividend": latest_dividend,
     }
 
 

@@ -59,6 +59,22 @@ def format_price(value):
     return round(float(value), 1)
 
 
+def format_quarter_label(report_date: str, metric_name: str):
+    year = report_date[:4]
+    month = int(report_date[5:7])
+
+    if month <= 3:
+        quarter = "Q1"
+    elif month <= 6:
+        quarter = "Q2"
+    elif month <= 9:
+        quarter = "Q3"
+    else:
+        quarter = "Q4"
+
+    return f"{year}{quarter} {metric_name}"
+
+
 def update_stock_analysis_sheet(reports: list[dict]):
     sheet = get_google_sheet()
 
@@ -80,6 +96,89 @@ def update_stock_analysis_sheet(reports: list[dict]):
     for report in reports:
         header.append(f"{report['stock_id']} {report['stock_name']}")
     values.append(header)
+
+    # 收集所有股票最近 4 季的 report_date
+    quarter_dates = []
+
+    for report in reports:
+        fundamentals = report.get("fundamentals", [])
+
+        for report_date, eps, gross_margin in fundamentals:
+            if report_date not in quarter_dates:
+                quarter_dates.append(report_date)
+
+    # 只取最近 4 季，但輸出時由舊到新
+    quarter_dates = sorted(quarter_dates, reverse=True)[:4]
+    quarter_dates = sorted(quarter_dates)
+
+    # EPS：由舊到新
+    for report_date in quarter_dates:
+        row = [format_quarter_label(report_date, "EPS")]
+
+        for report in reports:
+            fundamental_map = {
+                item[0]: item
+                for item in report.get("fundamentals", [])
+            }
+
+            item = fundamental_map.get(report_date)
+
+            if item:
+                _, eps, gross_margin = item
+                row.append(format_price(eps))
+            else:
+                row.append("")
+
+        values.append(row)
+
+    # 毛利率：由舊到新
+    for report_date in quarter_dates:
+        row = [format_quarter_label(report_date, "毛利率")]
+
+        for report in reports:
+            fundamental_map = {
+                item[0]: item
+                for item in report.get("fundamentals", [])
+            }
+
+            item = fundamental_map.get(report_date)
+
+            if item:
+                _, eps, gross_margin = item
+
+                if gross_margin is not None:
+                    row.append(f"{gross_margin:.1f}%")
+                else:
+                    row.append("")
+            else:
+                row.append("")
+
+        values.append(row)
+    # 本年度 / 最近年度配息
+    dividend_year = None
+
+    for report in reports:
+        latest_dividend = report.get("latest_dividend")
+
+        if latest_dividend:
+            dividend_year = latest_dividend[0]
+            break
+
+    if dividend_year:
+        row = [f"{dividend_year} 配息"]
+    else:
+        row = ["配息"]
+    
+    for report in reports:
+        latest_dividend = report.get("latest_dividend")
+
+        if latest_dividend:
+            year, cash_dividend = latest_dividend
+            row.append(format_price(cash_dividend))
+        else:
+            row.append("")
+
+    values.append(row)
 
     # 固定指標列：基本資料
     rows = [

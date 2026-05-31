@@ -1,17 +1,58 @@
 # Stock Pipeline
 
-一個用來更新股票資料，並將資料同步到 Google Sheets 的資料管線專案。
+一個用來收集台股資料、儲存至 SQLite，並同步更新 Google Sheets 的股票資料管線專案。
 
-本專案支援兩種執行方式：
+目前支援：
 
-- 使用 Docker 執行
-- 在本機 Python 環境直接執行
+* 每日收盤價
+* 最近 5 個交易日價格
+* 歷史高點
+* 一年高點
+* 半年高點
+* 三個月高點
+* 一個月高點
+* 最近 4 季 EPS
+* 最近 4 季毛利率
+* 最近年度配息
+* Google Sheets 自動同步
 
 ---
 
-## 專案下載
+# 專案架構
 
-先從 GitHub 下載專案：
+```text
+stock-pipeline/
+│
+├─ app/
+│  ├─ main.py
+│  ├─ backfill_prices.py
+│  ├─ backfill_fundamentals.py
+│  ├─ fetch_price.py
+│  ├─ fetch_fundamental.py
+│  ├─ portfolio.py
+│  ├─ database.py
+│  ├─ report.py
+│  ├─ google_sheet.py
+│  └─ config.py
+│
+├─ data/
+│  ├─ portfolio.csv
+│  └─ stocks.db
+│
+├─ credentials/
+│  └─ google_service_account.json
+│
+├─ .env
+├─ .env.example
+├─ Dockerfile
+├─ docker-compose.yml
+├─ requirements.txt
+└─ README.md
+```
+
+---
+
+# 專案下載
 
 ```bash
 git clone https://github.com/ZB12ZB12/stock-pipeline.git
@@ -20,40 +61,60 @@ cd stock-pipeline
 
 ---
 
-## 必要設定檔
+# 必要設定檔
 
-由於部分敏感檔案不會放進 Git，因此 pull 完專案後，需要自行補上以下檔案：
+由於部分敏感檔案不會放入 Git Repository，因此下載專案後需自行補上：
 
 ```text
 .env
 credentials/google_service_account.json
 ```
 
-### `.env`
+---
 
-請在專案根目錄建立 `.env` 檔案，用來放環境變數。
+## .env
 
-### `credentials/google_service_account.json`
+範例：
 
-請將 Google Service Account 的憑證檔放在：
+```env
+DB_PATH=data/stocks.db
+
+GOOGLE_SHEET_NAME=股票分析
+
+GOOGLE_CREDENTIAL_FILE=credentials/google_service_account.json
+
+FINMIND_TOKEN=
+```
+
+---
+
+## Google Service Account
+
+請將：
+
+```text
+google_service_account.json
+```
+
+放置於：
 
 ```text
 credentials/google_service_account.json
 ```
 
-此檔案通常用來讓程式可以存取 Google Sheets。
-
 ---
 
-## 使用 Docker 執行
+# 使用 Docker
 
-### 建立 Docker Image
+## 建立 Image
 
 ```bash
 docker compose build
 ```
 
-第一次建立 image 並執行時，也可以直接使用：
+---
+
+## 第一次建立並執行
 
 ```bash
 docker compose up --build
@@ -61,175 +122,195 @@ docker compose up --build
 
 ---
 
-## Docker 常用指令
-
-### 日常更新
-
-```bash
-docker compose run --rm stock-pipeline python -m app.main
-```
-
-也可以使用簡寫：
+## 日常更新
 
 ```bash
 docker compose run --rm stock-pipeline
 ```
 
-### 補股票歷史資料
+或
+
+```bash
+docker compose run --rm stock-pipeline python -m app.main
+```
+
+功能：
+
+* 更新最新收盤價
+* 更新 SQLite
+* 更新 Google Sheet
+
+---
+
+## 補股價歷史資料
 
 ```bash
 docker compose run --rm stock-pipeline python -m app.backfill_prices
 ```
 
----
+功能：
 
-## 在本機終端機直接執行
-
-如果不是使用 Docker，也可以直接在本機終端機執行 Python 指令。
-
-### 新增股票時
-
-新增股票時，建議先補歷史資料，再執行日常更新：
-
-```bash
-python -m app.backfill_prices
-python -m app.main
-```
-
-### 每天自動更新時
-
-每天自動更新只需要執行：
-
-```bash
-python -m app.main
-```
+* 補一年歷史收盤價
+* 新增股票後使用
 
 ---
 
-## 腳本說明
+## 補基本面資料
 
-### `app.backfill_prices`
+```bash
+docker compose run --rm stock-pipeline python -m app.backfill_fundamentals
+```
 
-執行指令：
+功能：
+
+* 補最近 4 季 EPS
+* 補最近 4 季毛利率
+* 補最近年度配息
+
+---
+
+# 本機執行
+
+## 補股價歷史資料
 
 ```bash
 python -m app.backfill_prices
 ```
 
-用途：
+---
 
-- 當想要新增一檔股票的數據時，就跑這個腳本
-- 既有股票：重新補資料，重複日期會被覆蓋
-- 新股票：新增一年歷史資料
-- 同一天同一檔股票不會重複新增
-- 當想要讓數據跑到 Google Sheets 上時，就跑這個腳本
+## 補基本面資料
 
-### `app.main`
+```bash
+python -m app.backfill_fundamentals
+```
 
-執行指令：
+---
+
+## 日常更新
 
 ```bash
 python -m app.main
 ```
 
-用途：
-
-- 每天自動更新時執行
-- 更新目前已設定股票的最新資料
-
 ---
 
-## 常見使用情境
+# Google Sheet 資料內容
 
-### 情境一：第一次啟動專案
-
-```bash
-git clone https://github.com/ZB12ZB12/stock-pipeline.git
-cd stock-pipeline
-```
-
-補上必要設定檔：
+目前會同步以下資料：
 
 ```text
-.env
-credentials/google_service_account.json
-```
+持有股數
 
-建立並啟動 Docker：
+最近四季 EPS
+最近四季毛利率
 
-```bash
-docker compose up --build
+最近年度配息
+
+歷史高點
+一年高點
+半年高點
+三個月高點
+一個月高點
+
+最近五個交易日收盤價
 ```
 
 ---
 
-### 情境二：新增股票資料
+# SQLite 資料表
 
-使用 Docker：
+## stock_prices
+
+儲存每日收盤價：
+
+```text
+stock_id
+trade_date
+close_price
+```
+
+---
+
+## stock_fundamentals
+
+儲存基本面資料：
+
+```text
+stock_id
+report_date
+eps
+gross_margin
+```
+
+---
+
+## stock_dividends
+
+儲存股利資料：
+
+```text
+stock_id
+year
+cash_dividend
+```
+
+---
+
+# 常見操作
+
+## 新增股票
+
+修改：
+
+```text
+data/portfolio.csv
+```
+
+新增股票後執行：
+
+```bash
+python -m app.backfill_prices
+python -m app.backfill_fundamentals
+python -m app.main
+```
+
+或 Docker：
 
 ```bash
 docker compose run --rm stock-pipeline python -m app.backfill_prices
-docker compose run --rm stock-pipeline python -m app.main
-```
 
-或使用本機 Python：
+docker compose run --rm stock-pipeline python -m app.backfill_fundamentals
 
-```bash
-python -m app.backfill_prices
-python -m app.main
-```
-
----
-
-### 情境三：每日更新資料
-
-使用 Docker：
-
-```bash
-docker compose run --rm stock-pipeline python -m app.main
-```
-
-或使用本機 Python：
-
-```bash
-python -m app.main
-```
-
----
-
-## 指令速查
-
-| 目的 | Docker 指令 | 本機指令 |
-| --- | --- | --- |
-| 建立 Docker image | `docker compose build` | - |
-| 第一次建立並啟動 | `docker compose up --build` | - |
-| 日常更新 | `docker compose run --rm stock-pipeline python -m app.main` | `python -m app.main` |
-| 補歷史資料 | `docker compose run --rm stock-pipeline python -m app.backfill_prices` | `python -m app.backfill_prices` |
-| 新增股票資料 | `docker compose run --rm stock-pipeline python -m app.backfill_prices` | `python -m app.backfill_prices` |
-
----
-
-## 建議流程
-
-### 開發或測試時
-
-```bash
-python -m app.backfill_prices
-python -m app.main
-```
-
-### 正式或排程執行時
-
-```bash
 docker compose run --rm stock-pipeline python -m app.main
 ```
 
 ---
 
-## 注意事項
+## 每日更新
 
-- `.env` 不應提交到 Git。
-- `credentials/google_service_account.json` 不應提交到 Git。
-- 若新增股票，請先執行 `app.backfill_prices`。
-- 若只是每日更新，執行 `app.main` 即可。
-- 若要讓數據跑到 Google Sheets 上，請執行 `app.backfill_prices`。
+```bash
+python -m app.main
+```
+
+或：
+
+```bash
+docker compose run --rm stock-pipeline
+```
+
+---
+
+# 注意事項
+
+* `.env` 不應提交至 Git。
+* `credentials/google_service_account.json` 不應提交至 Git。
+* `stocks.db` 不應提交至 Git。
+* 新增股票時建議先執行：
+
+  * `app.backfill_prices`
+  * `app.backfill_fundamentals`
+* 日常更新只需執行：
+
+  * `app.main`
+* Google Sheet 更新由 `app.main` 負責。
