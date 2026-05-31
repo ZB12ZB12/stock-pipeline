@@ -1,0 +1,22 @@
+{
+    "PCB": {
+        "name": "PCB",
+        "file": "data/portfolios/PCB.csv"
+    },
+    "connector": {
+        "name": "connector",
+        "file": "data/portfolios/connector.csv"
+    },
+    "CPO": {
+        "name": "CPO",
+        "file": "data/portfolios/CPO.csv"
+    },
+    "Drilling": {
+        "name": "Drilling",
+        "file": "data/portfolios/Drilling.csv"
+    },
+    "Equipment": {
+        "name": "Equipment",
+        "file": "data/portfolios/Equipment.csv"
+    }
+}

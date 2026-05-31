@@ -1,31 +1,36 @@
 from app.database import initialize_database, insert_stock_prices
 from app.fetch_price import fetch_historical_close_prices
-from app.portfolio import get_portfolio
+from app.portfolio import get_all_portfolios
 
 
 def backfill_all_stocks(period: str = "1y"):
     initialize_database()
 
-    portfolio = get_portfolio()
-    print(F"(backfill_prices.py)")
+    portfolio_groups = get_all_portfolios()
 
-    for item in portfolio:
-        stock_id = item["stock_id"]
+    for group in portfolio_groups:
+        group_name = group["name"]
+        portfolio = group["stocks"]
 
-        try:
-            print(f"Backfilling {stock_id}...")
+        print(f"\nBackfilling portfolio group: {group_name}")
 
-            price_data_list = fetch_historical_close_prices(
-                stock_id=stock_id,
-                period=period,
-            )
+        for item in portfolio:
+            stock_id = item["stock_id"]
 
-            insert_stock_prices(price_data_list)
+            try:
+                print(f"Backfilling {stock_id}...")
 
-            print(f"Done: {stock_id}")
+                price_data_list = fetch_historical_close_prices(
+                    stock_id=stock_id,
+                    period=period,
+                )
 
-        except Exception as e:
-            print(f"Failed: {stock_id}, reason: {e}")
+                insert_stock_prices(price_data_list)
+
+                print(f"Done: {stock_id}")
+
+            except Exception as e:
+                print(f"Failed: {stock_id}, reason: {e}")
 
 
 if __name__ == "__main__":

@@ -75,10 +75,11 @@ def format_quarter_label(report_date: str, metric_name: str):
     return f"{year}{quarter} {metric_name}"
 
 
-def update_stock_analysis_sheet(reports: list[dict]):
+# def update_stock_analysis_sheet(reports: list[dict]):
+def update_stock_analysis_sheet(reports: list[dict], worksheet_title: str = "股票分析"):
     sheet = get_google_sheet()
 
-    worksheet_title = "股票分析"
+    # worksheet_title = "股票分析"
 
     try:
         worksheet = sheet.worksheet(worksheet_title)

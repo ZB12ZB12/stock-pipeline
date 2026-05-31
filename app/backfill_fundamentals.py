@@ -7,30 +7,36 @@ from app.fetch_fundamental import (
     fetch_recent_fundamentals,
     fetch_latest_dividend,
 )
-from app.portfolio import get_portfolio
+from app.portfolio import get_all_portfolios
 
 
 def backfill_all_fundamentals():
     initialize_database()
 
-    portfolio = get_portfolio()
+    portfolio_groups = get_all_portfolios()
 
-    for item in portfolio:
-        stock_id = item["stock_id"]
+    for group in portfolio_groups:
+        group_name = group["name"]
+        portfolio = group["stocks"]
 
-        try:
-            print(f"Backfilling fundamentals: {stock_id}")
+        print(f"\nBackfilling fundamentals group: {group_name}")
 
-            fundamentals = fetch_recent_fundamentals(stock_id)
-            insert_fundamentals(fundamentals)
+        for item in portfolio:
+            stock_id = item["stock_id"]
 
-            dividends = fetch_latest_dividend(stock_id)
-            insert_dividends(dividends)
+            try:
+                print(f"Backfilling fundamentals: {stock_id}")
 
-            print(f"Done: {stock_id}")
+                fundamentals = fetch_recent_fundamentals(stock_id)
+                insert_fundamentals(fundamentals)
 
-        except Exception as e:
-            print(f"Failed: {stock_id}, reason: {e}")
+                dividends = fetch_latest_dividend(stock_id)
+                insert_dividends(dividends)
+
+                print(f"Done: {stock_id}")
+
+            except Exception as e:
+                print(f"Failed: {stock_id}, reason: {e}")
 
 
 if __name__ == "__main__":
