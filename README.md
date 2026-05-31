@@ -1,3 +1,5 @@
+# 高點的bug還沒修正完成，還沒讓4個高點顯示出來
+
 # Stock Pipeline
 
 一個用來收集台股資料、儲存至 SQLite，並同步更新 Google Sheets 的股票資料管線專案。
@@ -134,6 +136,14 @@ docker compose run --rm stock-pipeline
 docker compose run --rm stock-pipeline python -m app.main
 ```
 
+直接
+
+```bash
+python -m app.main
+```
+
+也可以。
+
 功能：
 
 * 更新最新收盤價
@@ -159,6 +169,12 @@ docker compose run --rm stock-pipeline python -m app.backfill_prices
 
 ```bash
 docker compose run --rm stock-pipeline python -m app.backfill_fundamentals
+```
+
+或
+
+```bash
+python -m app.backfill_fundamentals
 ```
 
 功能：
@@ -264,7 +280,7 @@ cash_dividend
 修改：
 
 ```text
-data/portfolio.csv
+data/portfolio/<自定義的類股>.csv
 ```
 
 新增股票後執行：
