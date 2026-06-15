@@ -7,17 +7,12 @@ pull 完後，需要補上 gitignore 裡面的檔案：
 1. .env
 2. credentials/google_service_account.json
 
-docker compose build
-
-日常更新: docker compose run --rm stock-pipeline python -m app.main
-    => docker compose run --rm stock-pipeline 也可以
-補資料腳本也用 Docker 跑: docker compose run --rm stock-pipeline python -m app.backfill_prices
-
 -
 
 在本機終端機直接跑：
 
 新增股票時：
+python -m app.backfill_fundamentals
 python -m app.backfill_prices
 python -m app.main
 
@@ -37,3 +32,11 @@ python -m app.backfill_prices
 -
 
 第一次建立 image 並執行: docker compose up --build
+
+-
+
+docker compose build
+
+日常更新: docker compose run --rm stock-pipeline python -m app.main
+    => docker compose run --rm stock-pipeline 也可以
+補資料腳本也用 Docker 跑: docker compose run --rm stock-pipeline python -m app.backfill_prices

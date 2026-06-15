@@ -10,4 +10,4 @@ services:
       - ./data:/app/data # 掛進 container，SQLite 才會保留
       - ./credentials:/app/credentials # 掛進 container，Google 金鑰才讀得到
 
-    restart: "no"
+    restart: "unless-stopped"

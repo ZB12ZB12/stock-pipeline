@@ -1,4 +1,5 @@
 import yfinance as yf
+from datetime import datetime
 
 
 def get_yahoo_symbols(stock_id: str):
@@ -13,30 +14,65 @@ def get_yahoo_symbols(stock_id: str):
     ]
 
 
+# def fetch_latest_close_price(stock_id: str):
+#     last_error = None
+
+#     for yahoo_symbol in get_yahoo_symbols(stock_id):
+#         try:
+#             ticker = yf.Ticker(yahoo_symbol)
+#             history = ticker.history(period="5d")
+
+#             if history.empty:
+#                 raise ValueError(f"No data for {yahoo_symbol}")
+
+#             latest_row = history.iloc[-1]
+
+#             return {
+#                 "stock_id": stock_id,
+#                 "yahoo_symbol": yahoo_symbol,
+#                 "trade_date": history.index[-1].date().isoformat(),
+#                 "close_price": float(latest_row["Close"]),
+#             }
+
+#         except Exception as e:
+#             last_error = e
+
+#     raise ValueError(f"找不到股票資料：{stock_id}, last_error={last_error}")
+
+
 def fetch_latest_close_price(stock_id: str):
+    symbols = [
+        f"{stock_id}.TW",   # 上市
+        f"{stock_id}.TWO",  # 上櫃
+    ]
+
     last_error = None
 
-    for yahoo_symbol in get_yahoo_symbols(stock_id):
+    for symbol in symbols:
         try:
-            ticker = yf.Ticker(yahoo_symbol)
-            history = ticker.history(period="5d")
+            ticker = yf.Ticker(symbol)
+            hist = ticker.history(period="5d")
 
-            if history.empty:
-                raise ValueError(f"No data for {yahoo_symbol}")
+            if hist.empty:
+                last_error = f"No data for {symbol}"
+                continue
 
-            latest_row = history.iloc[-1]
+            latest = hist.dropna().iloc[-1]
+            trade_date = hist.dropna().index[-1].date().isoformat()
+            close_price = float(latest["Close"])
 
             return {
                 "stock_id": stock_id,
-                "yahoo_symbol": yahoo_symbol,
-                "trade_date": history.index[-1].date().isoformat(),
-                "close_price": float(latest_row["Close"]),
+                "trade_date": trade_date,
+                "close_price": close_price,
+                "yahoo_symbol": symbol,
             }
 
         except Exception as e:
             last_error = e
+            continue
 
-    raise ValueError(f"找不到股票資料：{stock_id}, last_error={last_error}")
+    raise Exception(f"Failed to fetch price for {stock_id}. Last error: {last_error}")
 
 
 def fetch_historical_close_prices(stock_id: str, period: str = "1y"):

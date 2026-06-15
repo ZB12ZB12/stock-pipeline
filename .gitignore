@@ -9,7 +9,10 @@ __pycache__/
 .env
 
 # Google 金鑰不上傳
-credentials/
+credentials/google_service_account.json
+
+# Google 金鑰（原版）不上傳
+sheetAPI/
 
 # SQLite 資料庫不上傳
 data/*.db
