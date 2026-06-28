@@ -3,6 +3,11 @@
 切換到專案根目錄
     => cd stock-pipeline
 
+建立虛擬環境，並將所有需要的套件裝好：
+    => python3 -m venv .venv
+    => source .venv/bin/activate
+    => pip install -r requirements.txt
+
 pull 完後，需要補上 gitignore 裡面的檔案：
 1. .env
 2. credentials/google_service_account.json

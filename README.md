@@ -54,11 +54,19 @@ stock-pipeline/
 
 ---
 
-# 專案下載
+# 專案下載與環境建置
 
 ```bash
+# 從 github 拉檔案下來
 git clone https://github.com/ZB12ZB12/stock-pipeline.git
+
+# 切換到專案根目錄
 cd stock-pipeline
+
+# 建立虛擬環境，並將所有需要的套件裝好
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
 ```
 
 ---
@@ -124,90 +132,56 @@ docker compose up --build
 
 ---
 
-## 日常更新
+## 日常更新與補檔
 
-```bash
-docker compose run --rm stock-pipeline
-```
+* **日常更新**：
+  ```bash
+  docker compose run --rm stock-pipeline python -m app.main
+  ```
+  *(或直接執行 `docker compose run --rm stock-pipeline` 也可以)*
 
-或
-
-```bash
-docker compose run --rm stock-pipeline python -m app.main
-```
-
-直接
-
-```bash
-python -m app.main
-```
-
-也可以。
-
-功能：
-
-* 更新最新收盤價
-* 更新 SQLite
-* 更新 Google Sheet
-
----
-
-## 補股價歷史資料
-
-```bash
-docker compose run --rm stock-pipeline python -m app.backfill_prices
-```
-
-功能：
-
-* 補一年歷史收盤價
-* 新增股票後使用
-
----
-
-## 補基本面資料
-
-```bash
-docker compose run --rm stock-pipeline python -m app.backfill_fundamentals
-```
-
-或
-
-```bash
-python -m app.backfill_fundamentals
-```
-
-功能：
-
-* 補最近 4 季 EPS
-* 補最近 4 季毛利率
-* 補最近年度配息
+* **補資料腳本**：
+  ```bash
+  docker compose run --rm stock-pipeline python -m app.backfill_prices
+  ```
 
 ---
 
 # 本機執行
 
-## 補股價歷史資料
+## 執行流程
 
-```bash
-python -m app.backfill_prices
-```
+* **新增股票時**，請依序執行以下指令：
+  ```bash
+  python -m app.backfill_fundamentals
+  python -m app.backfill_prices
+  python -m app.main
+  ```
+
+* **日常自動更新時**，只需要執行：
+  ```bash
+  python -m app.main
+  ```
 
 ---
 
-## 補基本面資料
+## 腳本詳細說明
 
-```bash
-python -m app.backfill_fundamentals
-```
+### 1. 補股價歷史資料 (`python -m app.backfill_prices`)
+當想要新增或重新讀取股票的數據時，就跑這個腳本：
+* **既有股票**：重新補資料，重複日期會被覆蓋。
+* **新股票**：新增一年歷史資料。
+* **重複性防範**：同一天同一檔股票不會重複新增。
 
----
+### 2. 補基本面資料 (`python -m app.backfill_fundamentals`)
+當想要更新或補齊基本面資料時執行：
+* 補最近 4 季 EPS
+* 補最近 4 季毛利率
+* 補最近年度配息
 
-## 日常更新
-
-```bash
-python -m app.main
-```
+### 3. 日常更新與同步 (`python -m app.main`)
+當想要讓最新的收盤數據與報表同步到 Google Sheets 上時，就跑這個腳本：
+* 更新最新收盤價，儲存至 SQLite，並自動同步更新至 Google Sheets。
 
 ---
 
@@ -286,17 +260,17 @@ data/portfolio/<自定義的類股>.csv
 新增股票後執行：
 
 ```bash
-python -m app.backfill_prices
 python -m app.backfill_fundamentals
+python -m app.backfill_prices
 python -m app.main
 ```
 
 或 Docker：
 
 ```bash
-docker compose run --rm stock-pipeline python -m app.backfill_prices
-
 docker compose run --rm stock-pipeline python -m app.backfill_fundamentals
+
+docker compose run --rm stock-pipeline python -m app.backfill_prices
 
 docker compose run --rm stock-pipeline python -m app.main
 ```
@@ -312,7 +286,7 @@ python -m app.main
 或：
 
 ```bash
-docker compose run --rm stock-pipeline
+docker compose run --rm stock-pipeline python -m app.main
 ```
 
 ---
@@ -324,8 +298,8 @@ docker compose run --rm stock-pipeline
 * `stocks.db` 不應提交至 Git。
 * 新增股票時建議先執行：
 
-  * `app.backfill_prices`
   * `app.backfill_fundamentals`
+  * `app.backfill_prices`
 * 日常更新只需執行：
 
   * `app.main`
